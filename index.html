@@ -1,0 +1,569 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Anchorpoint — Bouldering &amp; Climbing Gym</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@500;600;700&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@500;600&display=swap" rel="stylesheet">
+<style>
+
+  /* ---------- Design tokens ---------- */
+  :root{
+    --concrete:       #1E1D1B;
+    --concrete-light: #29271F;
+    --chalk:          #F3EFE6;
+    --chalk-dim:      #CFC9BA;
+    --tape-yellow:    #E8B923;
+    --tape-red:       #D6431F;
+    --tape-teal:      #2C8C82;
+    --steel:          #8A8579;
+    --steel-dark:     #45423C;
+
+    --font-display: 'Oswald', sans-serif;
+    --font-body:    'Inter', sans-serif;
+    --font-mono:    'IBM Plex Mono', monospace;
+
+    --space-1: 0.5rem;
+    --space-2: 1rem;
+    --space-3: 1.5rem;
+    --space-4: 2.5rem;
+    --space-5: 4rem;
+    --space-6: 6rem;
+
+    --max-w: 1180px;
+  }
+
+  *, *::before, *::after{ box-sizing: border-box; }
+  html{ scroll-behavior: smooth; }
+  body{
+    margin: 0;
+    background: var(--concrete);
+    color: var(--chalk);
+    font-family: var(--font-body);
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+  }
+  img{ max-width:100%; display:block; }
+  a{ color: inherit; text-decoration: none; }
+  ul{ margin:0; padding:0; list-style:none; }
+  .wrap{
+    max-width: var(--max-w);
+    margin: 0 auto;
+    padding: 0 var(--space-3);
+  }
+  h1,h2,h3{
+    font-family: var(--font-display);
+    text-transform: uppercase;
+    letter-spacing: 0.02em;
+    margin: 0;
+    line-height: 1.05;
+  }
+  .eyebrow{
+    font-family: var(--font-mono);
+    font-size: 0.78rem;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--steel);
+    display: inline-flex;
+    align-items: center;
+    gap: 0.6em;
+  }
+  .eyebrow::before{
+    content: "";
+    width: 1.5em;
+    height: 2px;
+    background: var(--tape-yellow);
+    display: inline-block;
+  }
+
+  /* Grade chip — the signature wayfinding device.
+     Color encodes difficulty tier, same system a route-setter
+     uses tape color to mark a climb on the wall. */
+  .grade{
+    font-family: var(--font-mono);
+    font-weight: 600;
+    font-size: 0.82rem;
+    letter-spacing: 0.03em;
+    color: var(--concrete);
+    padding: 0.28em 0.7em;
+    display: inline-block;
+    transform: skewX(-8deg);
+  }
+  .grade > span{ display:inline-block; transform: skewX(8deg); }
+  .grade--easy{   background: var(--tape-teal); }
+  .grade--mid{    background: var(--tape-yellow); }
+  .grade--hard{   background: var(--tape-red); color: var(--chalk); }
+
+  /* ---------- Nav ---------- */
+  .nav{
+    position: sticky;
+    top: 0;
+    z-index: 50;
+    background: rgba(30,29,27,0.92);
+    backdrop-filter: blur(6px);
+    border-bottom: 3px solid var(--tape-yellow);
+  }
+  .nav .wrap{
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding-top: var(--space-2);
+    padding-bottom: var(--space-2);
+    flex-wrap: wrap;
+    gap: var(--space-2);
+  }
+  .brand{
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: 1.35rem;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+  }
+  .brand span{ color: var(--tape-yellow); }
+  .nav-links{
+    display: flex;
+    gap: var(--space-4);
+    flex-wrap: wrap;
+  }
+  .nav-links a{
+    font-family: var(--font-mono);
+    font-size: 0.82rem;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    position: relative;
+    padding-bottom: 4px;
+  }
+  .nav-links a::after{
+    content:"";
+    position:absolute;
+    left:0; bottom:0;
+    width:0%; height:2px;
+    background: var(--tape-red);
+    transition: width 0.25s ease;
+  }
+  .nav-links a:hover::after,
+  .nav-links a:focus-visible::after{ width:100%; }
+  .btn{
+    font-family: var(--font-mono);
+    font-size: 0.82rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--concrete);
+    background: var(--tape-red);
+    border: none;
+    padding: 0.85em 1.5em;
+    clip-path: polygon(6% 0, 100% 0, 94% 100%, 0 100%);
+    cursor: pointer;
+    transition: transform 0.2s ease, background 0.2s ease;
+  }
+  .btn:hover, .btn:focus-visible{
+    background: var(--tape-yellow);
+    transform: translateY(-2px);
+  }
+  .btn-ghost{
+    background: transparent;
+    color: var(--chalk);
+    border: 1px solid var(--steel-dark);
+    clip-path: none;
+  }
+  .btn-ghost:hover{ background: var(--concrete-light); }
+
+  /* ---------- Hero ---------- */
+  .hero{
+    position: relative;
+    padding: var(--space-6) 0 var(--space-5);
+    overflow: hidden;
+    background:
+      radial-gradient(circle at 15% 20%, rgba(232,185,35,0.07), transparent 40%),
+      radial-gradient(circle at 85% 60%, rgba(44,140,130,0.08), transparent 45%),
+      var(--concrete);
+  }
+  .hero::before{
+    /* subtle concrete grain */
+    content:"";
+    position:absolute; inset:0;
+    background-image:
+      repeating-linear-gradient(0deg, rgba(255,255,255,0.015) 0px, rgba(255,255,255,0.015) 1px, transparent 1px, transparent 3px);
+    pointer-events:none;
+  }
+  .hero-inner{
+    position: relative;
+    max-width: 780px;
+  }
+  .hero h1{
+    font-size: clamp(2.6rem, 6vw, 5.2rem);
+    margin: var(--space-2) 0 var(--space-3);
+  }
+  .hero h1 em{
+    font-style: normal;
+    color: var(--tape-yellow);
+  }
+  .hero p{
+    font-size: clamp(1rem, 1.6vw, 1.2rem);
+    color: var(--chalk-dim);
+    max-width: 46ch;
+    margin-bottom: var(--space-4);
+  }
+  .hero-cta{
+    display: flex;
+    gap: var(--space-3);
+    flex-wrap: wrap;
+    align-items: center;
+  }
+  .hero-stats{
+    display: flex;
+    gap: var(--space-5);
+    margin-top: var(--space-5);
+    flex-wrap: wrap;
+    border-top: 1px solid var(--steel-dark);
+    padding-top: var(--space-3);
+  }
+  .hero-stats div strong{
+    font-family: var(--font-display);
+    font-size: 1.8rem;
+    display:block;
+  }
+  .hero-stats div span{
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    color: var(--steel);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+  }
+
+  /* ---------- Section shell ---------- */
+  section{ padding: var(--space-6) 0; }
+  .section-head{
+    max-width: 640px;
+    margin-bottom: var(--space-4);
+  }
+  .section-head h2{
+    font-size: clamp(1.8rem, 3.4vw, 2.6rem);
+    margin-top: var(--space-1);
+  }
+  .section-head p{
+    color: var(--chalk-dim);
+    margin-top: var(--space-2);
+  }
+
+  /* ---------- Routes (features) ---------- */
+  .routes{ background: var(--concrete-light); }
+  .route-grid{
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: var(--space-3);
+  }
+  .route-card{
+    position: relative;
+    background: var(--concrete);
+    border: 1px solid var(--steel-dark);
+    padding: var(--space-3);
+    transition: transform 0.2s ease, border-color 0.2s ease;
+  }
+  .route-card:hover{
+    transform: translateY(-4px);
+    border-color: var(--steel);
+  }
+  /* tape-corner signature, rotated strip like a hold marker */
+  .route-card::before{
+    content:"";
+    position: absolute;
+    top: -8px; left: 20px;
+    width: 46px; height: 16px;
+    transform: rotate(-4deg);
+  }
+  .route-card--easy::before{ background: var(--tape-teal); }
+  .route-card--mid::before{  background: var(--tape-yellow); }
+  .route-card--hard::before{ background: var(--tape-red); }
+
+  .route-card h3{
+    font-size: 1.2rem;
+    margin: var(--space-2) 0 var(--space-1);
+  }
+  .route-card p{
+    color: var(--chalk-dim);
+    font-size: 0.95rem;
+    margin: 0 0 var(--space-2);
+  }
+
+  /* ---------- The Wall (about) ---------- */
+  .wall{
+    display: grid;
+    grid-template-columns: 1.1fr 0.9fr;
+    gap: var(--space-5);
+    align-items: center;
+  }
+  .wall-copy p{ color: var(--chalk-dim); margin-bottom: var(--space-2); }
+  .wall-panel{
+    background:
+      repeating-linear-gradient(135deg, var(--concrete-light) 0 18px, var(--concrete) 18px 36px);
+    border: 1px solid var(--steel-dark);
+    padding: var(--space-3);
+    min-height: 260px;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    gap: var(--space-1);
+  }
+  .wall-panel .hours{
+    font-family: var(--font-mono);
+    font-size: 0.85rem;
+    display: flex;
+    justify-content: space-between;
+    border-top: 1px dashed var(--steel-dark);
+    padding-top: var(--space-1);
+  }
+  .wall-panel .hours span:last-child{ color: var(--chalk-dim); }
+
+  /* ---------- Sends (testimonials) ---------- */
+  .sends{ background: var(--concrete-light); }
+  .send-grid{
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: var(--space-3);
+  }
+  .send-card{
+    background: var(--concrete);
+    border-left: 3px solid var(--tape-teal);
+    padding: var(--space-3);
+  }
+  .send-card p.quote{
+    font-size: 1.02rem;
+    margin: 0 0 var(--space-2);
+  }
+  .send-meta{
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    font-family: var(--font-mono);
+    font-size: 0.8rem;
+    color: var(--steel);
+  }
+
+  /* ---------- Footer ---------- */
+  footer{
+    border-top: 3px solid var(--tape-teal);
+    padding: var(--space-5) 0 var(--space-4);
+  }
+  .footer-grid{
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: var(--space-4);
+    margin-bottom: var(--space-4);
+  }
+  .footer-grid h4{
+    font-family: var(--font-mono);
+    font-size: 0.78rem;
+    text-transform: uppercase;
+    letter-spacing: 0.14em;
+    color: var(--steel);
+    margin: 0 0 var(--space-2);
+  }
+  .footer-grid p, .footer-grid a{
+    color: var(--chalk-dim);
+    font-size: 0.92rem;
+    display: block;
+    margin-bottom: 0.5em;
+  }
+  .footer-grid a:hover{ color: var(--tape-yellow); }
+  .footer-bottom{
+    border-top: 1px solid var(--steel-dark);
+    padding-top: var(--space-3);
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: var(--space-2);
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    color: var(--steel);
+  }
+
+  /* ---------- Responsive ---------- */
+  @media (max-width: 760px){
+    .wall{ grid-template-columns: 1fr; }
+    .hero-stats{ gap: var(--space-4); }
+    .nav-links{ gap: var(--space-3); }
+  }
+  @media (max-width: 480px){
+    .hero{ padding: var(--space-5) 0 var(--space-4); }
+    .btn{ width: 100%; text-align:center; }
+    .hero-cta{ flex-direction: column; align-items: stretch; }
+  }
+
+  @media (prefers-reduced-motion: reduce){
+    *{ transition: none !important; scroll-behavior: auto !important; }
+  }
+</style>
+</head>
+<body>
+
+  <nav class="nav">
+    <div class="wrap">
+      <a href="#top" class="brand">ANCHOR<span>POINT</span></a>
+      <ul class="nav-links">
+        <li><a href="#routes">Routes</a></li>
+        <li><a href="#wall">The Wall</a></li>
+        <li><a href="#sends">Sends</a></li>
+        <li><a href="#visit">Visit</a></li>
+      </ul>
+      <a href="#visit" class="btn">Book a Day Pass</a>
+    </div>
+  </nav>
+
+  <header class="hero" id="top">
+    <div class="wrap hero-inner">
+      <span class="eyebrow">Bouldering &amp; Rope Gym — Est. 2019</span>
+      <h1>Find your next <em>problem.</em></h1>
+      <p>Forty new routes reset every week across 12,000 sq ft of wall — from your first traverse on the beginner slab to your hardest send on the overhang.</p>
+      <div class="hero-cta">
+        <a href="#visit" class="btn">Book a Day Pass</a>
+        <a href="#routes" class="btn btn-ghost">See This Week's Routes</a>
+      </div>
+      <div class="hero-stats">
+        <div><strong>40+</strong><span>Routes reset weekly</span></div>
+        <div><strong>12k</strong><span>Sq ft of wall</span></div>
+        <div><strong>V0–V10</strong><span>Grade range</span></div>
+      </div>
+    </div>
+  </header>
+
+  <section class="routes" id="routes">
+    <div class="wrap">
+      <div class="section-head">
+        <span class="eyebrow">What's On The Wall</span>
+        <h2>Routes for every session</h2>
+        <p>Every program is tagged by difficulty the same way a route-setter tapes a hold — so you always know what you're walking into.</p>
+      </div>
+      <div class="route-grid">
+
+        <article class="route-card route-card--easy">
+          <span class="grade grade--easy"><span>V0–V2</span></span>
+          <h3>First Traverse</h3>
+          <p>A 90-minute intro to movement, footwork, and falling safely. No experience or gear needed — shoes and chalk included.</p>
+        </article>
+
+        <article class="route-card route-card--easy">
+          <span class="grade grade--easy"><span>5.6–5.8</span></span>
+          <h3>Top-Rope Basics</h3>
+          <p>Belay certification in one session. Learn the knot, the catch, and the communication that keeps every climb safe.</p>
+        </article>
+
+        <article class="route-card route-card--mid">
+          <span class="grade grade--mid"><span>V3–V5</span></span>
+          <h3>Movement Lab</h3>
+          <p>A weekly small-group session on flagging, heel hooks, and reading a problem before you touch the wall.</p>
+        </article>
+
+        <article class="route-card route-card--mid">
+          <span class="grade grade--mid"><span>5.10–5.11</span></span>
+          <h3>Youth Team</h3>
+          <p>Structured training for climbers 8–17, built around competition prep and long-term technique.</p>
+        </article>
+
+        <article class="route-card route-card--hard">
+          <span class="grade grade--hard"><span>V6–V8</span></span>
+          <h3>The Board Room</h3>
+          <p>Open access to our adjustable training board — kilter-style, angle-tunable, for climbers chasing a specific grade.</p>
+        </article>
+
+        <article class="route-card route-card--hard">
+          <span class="grade grade--hard"><span>5.12+</span></span>
+          <h3>Setter's Circuit</h3>
+          <p>Our hardest lines, reset monthly by the same crew that sets for regional comps. Limited to members.</p>
+        </article>
+
+      </div>
+    </div>
+  </section>
+
+  <section class="wall" id="wall">
+    <div class="wrap wall">
+      <div class="wall-copy">
+        <span class="eyebrow">The Space</span>
+        <h2>Built by climbers, for the next hold</h2>
+        <p>Anchorpoint started in a converted warehouse with one wall and a handful of regulars trading beta over coffee. Six years later, the warehouse is still here — bare concrete, steel trusses, and a wall that gets reset every week by setters who climb it themselves.</p>
+        <p>We kept the things that mattered: a community board where people actually talk to each other, a training room that doesn't feel like an afterthought, and a front desk that remembers your name by your second visit.</p>
+        <a href="#visit" class="btn btn-ghost">Get Directions</a>
+      </div>
+      <div class="wall-panel">
+        <div class="hours"><span>Mon – Fri</span><span>6:00 AM – 11:00 PM</span></div>
+        <div class="hours"><span>Saturday</span><span>8:00 AM – 10:00 PM</span></div>
+        <div class="hours"><span>Sunday</span><span>8:00 AM – 8:00 PM</span></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="sends" id="sends">
+    <div class="wrap">
+      <div class="section-head">
+        <span class="eyebrow">Member Sends</span>
+        <h2>Every send starts as a project</h2>
+      </div>
+      <div class="send-grid">
+
+        <article class="send-card">
+          <p class="quote">"I walked in for the intro class and stayed for the community. Eighteen months later I sent my first V5 with half the gym cheering."</p>
+          <div class="send-meta">
+            <span>— Priya R., Member since 2023</span>
+            <span class="grade grade--mid"><span>V5</span></span>
+          </div>
+        </article>
+
+        <article class="send-card">
+          <p class="quote">"The Movement Lab rebuilt my footwork from scratch. I climb slower now, and I fall off a lot less."</p>
+          <div class="send-meta">
+            <span>— Dev K., Member since 2022</span>
+            <span class="grade grade--easy"><span>V3</span></span>
+          </div>
+        </article>
+
+        <article class="send-card">
+          <p class="quote">"Setter's Circuit is the only place in the city that resets hard lines this often. I trained here for six months before my first outdoor 5.12."</p>
+          <div class="send-meta">
+            <span>— Aman S., Member since 2021</span>
+            <span class="grade grade--hard"><span>5.12a</span></span>
+          </div>
+        </article>
+
+      </div>
+    </div>
+  </section>
+
+  <footer id="visit">
+    <div class="wrap">
+      <div class="footer-grid">
+        <div>
+          <h4>Visit</h4>
+          <p>14 Foundry Lane<br>Warehouse District</p>
+          <p>Open 7 days a week</p>
+        </div>
+        <div>
+          <h4>Connect</h4>
+          <a href="#">Instagram</a>
+          <a href="#">YouTube</a>
+          <a href="#">Community Board</a>
+        </div>
+        <div>
+          <h4>Programs</h4>
+          <a href="#routes">First Traverse</a>
+          <a href="#routes">Youth Team</a>
+          <a href="#routes">Setter's Circuit</a>
+        </div>
+        <div>
+          <h4>Contact</h4>
+          <a href="#">hello@anchorpoint.example</a>
+          <a href="#">+1 (555) 019-2044</a>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <span>© 2026 Anchorpoint Climbing Co.</span>
+        <span>Set weekly. Climbed daily.</span>
+      </div>
+    </div>
+  </footer>
+
+</body>
+</html>
