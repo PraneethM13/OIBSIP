@@ -1,0 +1,460 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Praneeth Madduri — Portfolio</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+
+  /* ---------- Design tokens — VS Code Dark+ inspired syntax palette ---------- */
+  :root{
+    --bg:          #1E1E1E;
+    --panel:       #252526;
+    --panel-line:  #333333;
+    --text:        #D4D4D4;
+    --text-dim:    #8A8A8A;
+    --keyword:     #C586C0;  /* purple  — keywords / labels        */
+    --func:        #DCDCAA;  /* yellow  — function / project names */
+    --string:      #CE9178;  /* orange  — string-like values       */
+    --comment:     #6A9955;  /* green   — comments / about text    */
+    --type:        #4EC9B0;  /* teal    — types / skills           */
+    --accent:      #569CD6;  /* blue    — links / active state     */
+
+    --font-mono: 'JetBrains Mono', monospace;
+    --font-body: 'Inter', sans-serif;
+
+    --sp-1: 0.5rem;
+    --sp-2: 1rem;
+    --sp-3: 1.5rem;
+    --sp-4: 2.5rem;
+    --sp-5: 4rem;
+    --sp-6: 6rem;
+
+    --max-w: 1080px;
+  }
+
+  *, *::before, *::after{ box-sizing: border-box; }
+  html{ scroll-behavior: smooth; }
+  body{
+    margin: 0;
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--font-body);
+    line-height: 1.65;
+    -webkit-font-smoothing: antialiased;
+  }
+  a{ color: inherit; text-decoration: none; }
+  ul{ margin:0; padding:0; list-style:none; }
+  .wrap{ max-width: var(--max-w); margin: 0 auto; padding: 0 var(--sp-3); }
+  .mono{ font-family: var(--font-mono); }
+
+  code.line{
+    font-family: var(--font-mono);
+    display: block;
+  }
+  .kw{ color: var(--keyword); font-weight: 600; }
+  .fn{ color: var(--func); }
+  .str{ color: var(--string); }
+  .type{ color: var(--type); }
+  .cm{ color: var(--comment); }
+  .pn{ color: var(--text-dim); }
+
+  /* ---------- Tab bar / nav ---------- */
+  .tabbar{
+    position: sticky;
+    top: 0;
+    z-index: 50;
+    background: var(--panel);
+    border-bottom: 1px solid var(--panel-line);
+  }
+  .tabbar .wrap{
+    display: flex;
+    align-items: stretch;
+    gap: 2px;
+    overflow-x: auto;
+    padding: 0 var(--sp-2);
+  }
+  .tabbar a{
+    display: flex;
+    align-items: center;
+    gap: 0.5em;
+    font-family: var(--font-mono);
+    font-size: 0.82rem;
+    color: var(--text-dim);
+    padding: 0.9em 1.1em;
+    border-right: 1px solid var(--panel-line);
+    white-space: nowrap;
+    border-bottom: 2px solid transparent;
+    transition: color 0.2s ease, border-color 0.2s ease;
+  }
+  .tabbar a:hover, .tabbar a:focus-visible{
+    color: var(--text);
+    border-bottom-color: var(--accent);
+  }
+  .tabbar .dot{
+    width: 7px; height: 7px;
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+  .dot--about{ background: var(--comment); }
+  .dot--skills{ background: var(--type); }
+  .dot--projects{ background: var(--func); }
+  .dot--contact{ background: var(--accent); }
+
+  /* ---------- Section shell ---------- */
+  section{ padding: var(--sp-6) 0; border-bottom: 1px solid var(--panel-line); }
+  section:last-of-type{ border-bottom: none; }
+  .section-tag{
+    font-family: var(--font-mono);
+    font-size: 0.8rem;
+    color: var(--text-dim);
+    margin-bottom: var(--sp-2);
+  }
+  .section-tag .path{ color: var(--accent); }
+
+  /* ---------- Hero ---------- */
+  .hero{
+    padding: var(--sp-6) 0 var(--sp-5);
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: var(--sp-5);
+    align-items: center;
+  }
+  .avatar{
+    width: 140px;
+    height: 140px;
+    border-radius: 10px;
+    background: var(--panel);
+    border: 1px solid var(--panel-line);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: var(--font-mono);
+    font-size: 2.6rem;
+    font-weight: 700;
+    color: var(--accent);
+    flex-shrink: 0;
+  }
+  .hero-copy code.line{ font-size: 1.05rem; }
+  .hero-name{
+    font-family: var(--font-mono);
+    font-size: clamp(2rem, 4.5vw, 3.2rem);
+    font-weight: 700;
+    color: var(--func);
+    margin: 0.4em 0 0.2em;
+  }
+  .hero-role{
+    font-family: var(--font-mono);
+    color: var(--string);
+    font-size: 1.05rem;
+    margin-bottom: var(--sp-2);
+  }
+  .hero-desc{
+    color: var(--text-dim);
+    max-width: 46ch;
+    font-size: 1rem;
+  }
+
+  /* ---------- About ---------- */
+  .about-block{
+    background: var(--panel);
+    border: 1px solid var(--panel-line);
+    border-left: 3px solid var(--comment);
+    padding: var(--sp-3) var(--sp-4);
+    font-family: var(--font-mono);
+    font-size: 0.95rem;
+    color: var(--comment);
+    max-width: 760px;
+    line-height: 1.9;
+  }
+  .about-block .plain{
+    font-family: var(--font-body);
+    color: var(--text);
+    font-size: 1.02rem;
+    margin-top: var(--sp-2);
+  }
+
+  /* ---------- Skills ---------- */
+  .skills-groups{
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: var(--sp-4);
+  }
+  .skills-groups h3{
+    font-family: var(--font-mono);
+    font-size: 0.9rem;
+    color: var(--type);
+    margin: 0 0 var(--sp-2);
+  }
+  .skill-chips{ display: flex; flex-wrap: wrap; gap: 0.6em; }
+  .chip{
+    font-family: var(--font-mono);
+    font-size: 0.85rem;
+    background: var(--panel);
+    border: 1px solid var(--panel-line);
+    color: var(--text);
+    padding: 0.45em 0.85em;
+    border-radius: 4px;
+    transition: border-color 0.2s ease, transform 0.2s ease;
+  }
+  .chip:hover{ border-color: var(--accent); transform: translateY(-2px); }
+
+  /* ---------- Projects ---------- */
+  .project-grid{
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: var(--sp-3);
+  }
+  .project-card{
+    background: var(--panel);
+    border: 1px solid var(--panel-line);
+    padding: var(--sp-3);
+    display: flex;
+    flex-direction: column;
+    transition: border-color 0.2s ease, transform 0.2s ease;
+  }
+  .project-card:hover{ border-color: var(--accent); transform: translateY(-3px); }
+  .project-card .file-line{
+    font-family: var(--font-mono);
+    font-size: 0.78rem;
+    color: var(--text-dim);
+    margin-bottom: var(--sp-1);
+  }
+  .project-card h3{
+    font-family: var(--font-mono);
+    font-size: 1.15rem;
+    color: var(--func);
+    margin: 0 0 var(--sp-1);
+  }
+  .project-card .stack{
+    font-family: var(--font-mono);
+    font-size: 0.78rem;
+    color: var(--type);
+    margin-bottom: var(--sp-2);
+  }
+  .project-card p{
+    color: var(--text-dim);
+    font-size: 0.95rem;
+    margin: 0 0 var(--sp-2);
+    flex-grow: 1;
+  }
+  .project-card .repo-link{
+    font-family: var(--font-mono);
+    font-size: 0.85rem;
+    color: var(--accent);
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4em;
+  }
+  .project-card .repo-link:hover{ text-decoration: underline; }
+  .placeholder-note{
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+    color: var(--keyword);
+    margin-top: var(--sp-1);
+  }
+
+  /* ---------- Contact ---------- */
+  .contact-block{
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    flex-wrap: wrap;
+    gap: var(--sp-3);
+  }
+  .contact-info code.line{ font-size: 0.98rem; margin-bottom: 0.3em; }
+  .socials{ display: flex; gap: var(--sp-2); }
+  .social-btn{
+    font-family: var(--font-mono);
+    font-size: 0.85rem;
+    border: 1px solid var(--panel-line);
+    background: var(--panel);
+    padding: 0.7em 1.2em;
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    gap: 0.5em;
+    transition: border-color 0.2s ease, color 0.2s ease;
+  }
+  .social-btn:hover{ border-color: var(--accent); color: var(--accent); }
+
+  footer{
+    padding: var(--sp-4) 0;
+    text-align: center;
+    font-family: var(--font-mono);
+    font-size: 0.78rem;
+    color: var(--text-dim);
+  }
+  footer .heart{ color: var(--string); }
+
+  /* ---------- Responsive ---------- */
+  @media (max-width: 700px){
+    .hero{ grid-template-columns: 1fr; text-align: left; }
+    .avatar{ width: 100px; height: 100px; font-size: 2rem; }
+    .contact-block{ flex-direction: column; align-items: flex-start; }
+  }
+  @media (max-width: 480px){
+    section{ padding: var(--sp-5) 0; }
+  }
+
+  @media (prefers-reduced-motion: reduce){
+    *{ transition: none !important; scroll-behavior: auto !important; }
+  }
+</style>
+</head>
+<body>
+
+  <nav class="tabbar">
+    <div class="wrap">
+      <a href="#about"><span class="dot dot--about"></span>about.md</a>
+      <a href="#skills"><span class="dot dot--skills"></span>skills.json</a>
+      <a href="#projects"><span class="dot dot--projects"></span>projects.js</a>
+      <a href="#leadership"><span class="dot dot--about"></span>leadership.yml</a>
+      <a href="#contact"><span class="dot dot--contact"></span>contact.sh</a>
+    </div>
+  </nav>
+
+  <header class="hero" id="top">
+    <div class="wrap" style="display:contents;">
+      <div class="avatar">PM</div>
+      <div class="hero-copy">
+        <code class="line"><span class="kw">const</span> <span class="fn">developer</span> <span class="pn">=</span> <span class="pn">{</span></code>
+        <h1 class="hero-name">Praneeth Madduri</h1>
+        <p class="hero-role">// Information Science &amp; Engineering Student</p>
+        <p class="hero-desc">Building AI-powered applications and full-stack web solutions — currently an Information Science &amp; Engineering undergraduate at Malnad College of Engineering, focused on Python, Django, and Machine Learning.</p>
+      </div>
+    </div>
+  </header>
+
+  <section id="about">
+    <div class="wrap">
+      <p class="section-tag">$ cat <span class="path">about.md</span></p>
+      <div class="about-block">
+        <code class="line">/**</code>
+        <code class="line"> * about-me.txt</code>
+        <code class="line"> */</code>
+        <p class="plain">Motivated Information Science &amp; Engineering undergraduate at Malnad College of Engineering (CGPA: 8.7/10) with hands-on experience in Python, Django, Machine Learning, and NLP. Passionate about building AI-powered applications and full-stack solutions. Active club leader in the Digital &amp; Management domain, seeking an internship or entry-level role in Software Development or AI/ML Engineering.</p>
+      </div>
+    </div>
+  </section>
+
+  <section id="skills">
+    <div class="wrap">
+      <p class="section-tag">$ cat <span class="path">skills.json</span></p>
+      <div class="skills-groups">
+
+        <div>
+          <h3>// Programming</h3>
+          <div class="skill-chips">
+            <span class="chip">Python</span>
+            <span class="chip">Java</span>
+            <span class="chip">C</span>
+            <span class="chip">HTML5</span>
+            <span class="chip">CSS3</span>
+            <span class="chip">JavaScript</span>
+          </div>
+        </div>
+
+        <div>
+          <h3>// AI / ML &amp; Web</h3>
+          <div class="skill-chips">
+            <span class="chip">Machine Learning</span>
+            <span class="chip">NLP</span>
+            <span class="chip">ATS Systems</span>
+            <span class="chip">Django</span>
+            <span class="chip">REST APIs</span>
+          </div>
+        </div>
+
+        <div>
+          <h3>// Tools &amp; Platforms</h3>
+          <div class="skill-chips">
+            <span class="chip">Git &amp; GitHub</span>
+            <span class="chip">SQLite</span>
+            <span class="chip">SQL</span>
+            <span class="chip">VS Code</span>
+            <span class="chip">Linux</span>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <section id="projects">
+    <div class="wrap">
+      <p class="section-tag">$ cat <span class="path">projects.js</span></p>
+      <div class="project-grid">
+
+        <article class="project-card">
+          <p class="file-line">01 &middot; academic project &middot; 2024</p>
+          <h3>AI-Powered Smart Resume Analyzer</h3>
+          <p class="stack">Python · NLP · Machine Learning · Resume Parsing</p>
+          <p>An AI-driven system that parses resumes and evaluates them against job descriptions, generating ATS compatibility scores via NLP keyword extraction and cosine similarity. Includes a skill-gap detection engine with automated career optimization recommendations to improve resume-to-JD match rate.</p>
+          <a href="#" class="repo-link">→ github.com/praneethm/smart-resume-analyzer</a>
+          <p class="placeholder-note">// update with your actual repo link</p>
+        </article>
+
+        <article class="project-card">
+          <p class="file-line">02 &middot; hackathon build &middot; 2024</p>
+          <h3>Food Recovery &amp; Recycling Platform</h3>
+          <p class="stack">Django · HTML5 · CSS3 · JavaScript · SQLite · REST APIs</p>
+          <p>A full-stack Django platform for surplus food recovery and NGO coordination, featuring real-time dashboards and automated impact reporting. Built scalable REST API workflows for composting and waste reduction, delivered as a working prototype at a hackathon hosted by Atria University, Bengaluru.</p>
+          <a href="#" class="repo-link">→ github.com/praneethm/food-recovery-platform</a>
+          <p class="placeholder-note">// update with your actual repo link</p>
+        </article>
+
+      </div>
+    </div>
+  </section>
+
+  <section id="leadership">
+    <div class="wrap">
+      <p class="section-tag">$ cat <span class="path">leadership.yml</span></p>
+      <div class="project-grid">
+
+        <article class="project-card">
+          <p class="file-line">2023 — Present</p>
+          <h3>Office Bearer, Digital &amp; Management Domain</h3>
+          <p class="stack">Club Committee · Malnad College of Engineering</p>
+          <p>Led digital outreach, coordinated college events, and managed administrative operations for the committee. Collaborated with interdisciplinary teams to plan and execute large-scale college activities.</p>
+        </article>
+
+        <article class="project-card">
+          <p class="file-line">2024</p>
+          <h3>Hackathon Participant</h3>
+          <p class="stack">Atria University, Bengaluru</p>
+          <p>Built and presented a social-impact food recovery platform in collaboration with NGO partners, competing against teams from multiple colleges.</p>
+        </article>
+
+      </div>
+    </div>
+  </section>
+
+  <section id="contact">
+    <div class="wrap">
+      <p class="section-tag">$ cat <span class="path">contact.sh</span></p>
+      <div class="contact-block">
+        <div class="contact-info">
+          <code class="line"><span class="kw">export</span> <span class="type">NAME</span><span class="pn">=</span><span class="str">"Praneeth Madduri"</span></code>
+          <code class="line"><span class="kw">export</span> <span class="type">EMAIL</span><span class="pn">=</span><span class="str">"praneethmadduri20006@gmail.com"</span></code>
+          <code class="line"><span class="kw">export</span> <span class="type">PHONE</span><span class="pn">=</span><span class="str">"+91-9902698890"</span></code>
+          <code class="line"><span class="kw">export</span> <span class="type">LOCATION</span><span class="pn">=</span><span class="str">"Hassan, Karnataka, India"</span></code>
+        </div>
+        <div class="socials">
+          <a href="https://github.com/praneethm" class="social-btn">GitHub ↗</a>
+          <a href="https://linkedin.com/in/praneethm" class="social-btn">LinkedIn ↗</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <footer>
+    <div class="wrap">Built with HTML &amp; CSS <span class="heart">&hearts;</span> — no frameworks, no build step.</div>
+  </footer>
+
+</body>
+</html>
