@@ -1,0 +1,398 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Temperature Converter</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@500;600&display=swap" rel="stylesheet">
+<style>
+
+  :root{
+    --bg:        #0F1420;
+    --panel:     #171E2E;
+    --panel-2:   #1F2740;
+    --border:    #2B3350;
+    --text:      #E7EAF2;
+    --text-dim:  #8A93AE;
+
+    --celsius:    #3DA8F5;
+    --fahrenheit: #F5A93D;
+    --kelvin:     #B076F0;
+    --error:      #F5573D;
+    --ok:         #3DF5A0;
+
+    --font-display: 'Space Grotesk', sans-serif;
+    --font-body: 'Inter', sans-serif;
+    --font-mono: 'IBM Plex Mono', monospace;
+  }
+
+  *, *::before, *::after{ box-sizing: border-box; }
+  body{
+    margin: 0;
+    min-height: 100vh;
+    background:
+      radial-gradient(circle at 20% 10%, rgba(61,168,245,0.08), transparent 40%),
+      radial-gradient(circle at 80% 90%, rgba(245,169,61,0.07), transparent 45%),
+      var(--bg);
+    color: var(--text);
+    font-family: var(--font-body);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 2.5rem 1rem;
+    line-height: 1.5;
+  }
+
+  .app{
+    width: 100%;
+    max-width: 480px;
+  }
+
+  .app-head{
+    text-align: center;
+    margin-bottom: 1.8rem;
+  }
+  .app-head .eyebrow{
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--text-dim);
+  }
+  .app-head h1{
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: 1.9rem;
+    margin: 0.4em 0 0.3em;
+  }
+  .app-head p{
+    color: var(--text-dim);
+    font-size: 0.92rem;
+    margin: 0;
+  }
+
+  .card{
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 1.8rem;
+  }
+
+  label{
+    display: block;
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--text-dim);
+    margin-bottom: 0.5rem;
+  }
+
+  .input-row{
+    display: flex;
+    gap: 0.7rem;
+    align-items: stretch;
+  }
+
+  #tempInput{
+    flex: 1;
+    min-width: 0;
+    background: var(--panel-2);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    color: var(--text);
+    font-family: var(--font-display);
+    font-size: 1.4rem;
+    font-weight: 600;
+    padding: 0.7em 0.9em;
+    outline: none;
+    transition: border-color 0.2s ease;
+  }
+  #tempInput:focus{ border-color: var(--celsius); }
+  #tempInput.invalid{ border-color: var(--error); }
+
+  /* Thermometer bar — fills based on the parsed value, tinted by selected unit */
+  .thermo{
+    width: 34px;
+    border-radius: 8px;
+    background: var(--panel-2);
+    border: 1px solid var(--border);
+    position: relative;
+    overflow: hidden;
+    flex-shrink: 0;
+  }
+  .thermo-fill{
+    position: absolute;
+    left: 0; right: 0; bottom: 0;
+    height: 4%;
+    border-radius: 8px 8px 0 0;
+    background: linear-gradient(180deg, var(--fahrenheit), var(--celsius));
+    transition: height 0.4s ease, background 0.3s ease;
+  }
+
+  .unit-select{
+    margin-top: 1.2rem;
+  }
+  .unit-chips{
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 0.6rem;
+  }
+  .unit-chip{
+    position: relative;
+  }
+  .unit-chip input{
+    position: absolute;
+    opacity: 0;
+    width: 100%; height: 100%;
+    cursor: pointer;
+    margin: 0;
+  }
+  .unit-chip span{
+    display: block;
+    text-align: center;
+    font-family: var(--font-mono);
+    font-size: 0.85rem;
+    font-weight: 600;
+    padding: 0.65em 0;
+    border-radius: 8px;
+    border: 1px solid var(--border);
+    background: var(--panel-2);
+    color: var(--text-dim);
+    transition: all 0.2s ease;
+  }
+  .unit-chip input:checked + span{
+    color: var(--bg);
+  }
+  .unit-chip.c input:checked + span{ background: var(--celsius); border-color: var(--celsius); }
+  .unit-chip.f input:checked + span{ background: var(--fahrenheit); border-color: var(--fahrenheit); }
+  .unit-chip.k input:checked + span{ background: var(--kelvin); border-color: var(--kelvin); }
+  .unit-chip input:focus-visible + span{ outline: 2px solid var(--text); outline-offset: 2px; }
+
+  .convert-btn{
+    width: 100%;
+    margin-top: 1.3rem;
+    background: var(--celsius);
+    color: var(--bg);
+    border: none;
+    border-radius: 8px;
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: 1rem;
+    padding: 0.85em;
+    cursor: pointer;
+    transition: transform 0.15s ease, filter 0.15s ease;
+  }
+  .convert-btn:hover{ filter: brightness(1.1); }
+  .convert-btn:active{ transform: scale(0.98); }
+
+  .message{
+    margin-top: 1rem;
+    padding: 0.8em 1em;
+    border-radius: 8px;
+    font-size: 0.88rem;
+    display: none;
+    font-family: var(--font-body);
+  }
+  .message.show{ display: block; }
+  .message.error{
+    background: rgba(245, 87, 61, 0.12);
+    border: 1px solid var(--error);
+    color: #FFC7BC;
+  }
+
+  .results{
+    margin-top: 1.4rem;
+    display: none;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 0.7rem;
+  }
+  .results.show{ display: grid; }
+  .result-card{
+    background: var(--panel-2);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 0.9em 0.6em;
+    text-align: center;
+    border-top: 3px solid transparent;
+  }
+  .result-card.celsius{ border-top-color: var(--celsius); }
+  .result-card.fahrenheit{ border-top-color: var(--fahrenheit); }
+  .result-card.kelvin{ border-top-color: var(--kelvin); }
+  .result-card .unit-label{
+    font-family: var(--font-mono);
+    font-size: 0.68rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--text-dim);
+    margin-bottom: 0.4em;
+  }
+  .result-card .value{
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: 1.25rem;
+    word-break: break-word;
+  }
+
+  footer{
+    text-align: center;
+    margin-top: 1.5rem;
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+    color: var(--text-dim);
+  }
+
+  @media (max-width: 420px){
+    .card{ padding: 1.3rem; }
+    .results{ grid-template-columns: 1fr 1fr 1fr; gap: 0.5rem; }
+    .result-card .value{ font-size: 1.05rem; }
+  }
+</style>
+</head>
+<body>
+
+  <div class="app">
+    <div class="app-head">
+      <span class="eyebrow">Convert · Compare · Check</span>
+      <h1>Temperature Converter</h1>
+      <p>Enter a value, pick its unit, and see it converted across all three scales.</p>
+    </div>
+
+    <div class="card">
+      <label for="tempInput">Temperature value</label>
+      <div class="input-row">
+        <input type="text" id="tempInput" inputmode="decimal" placeholder="e.g. 25" autocomplete="off">
+        <div class="thermo" aria-hidden="true">
+          <div class="thermo-fill" id="thermoFill"></div>
+        </div>
+      </div>
+
+      <div class="unit-select">
+        <label>Input unit</label>
+        <div class="unit-chips">
+          <label class="unit-chip c">
+            <input type="radio" name="unit" value="C" checked>
+            <span>°C</span>
+          </label>
+          <label class="unit-chip f">
+            <input type="radio" name="unit" value="F">
+            <span>°F</span>
+          </label>
+          <label class="unit-chip k">
+            <input type="radio" name="unit" value="K">
+            <span>K</span>
+          </label>
+        </div>
+      </div>
+
+      <button class="convert-btn" id="convertBtn" type="button">Convert</button>
+
+      <div class="message error" id="errorMsg"></div>
+
+      <div class="results" id="results">
+        <div class="result-card celsius">
+          <div class="unit-label">Celsius</div>
+          <div class="value" id="outC">—</div>
+        </div>
+        <div class="result-card fahrenheit">
+          <div class="unit-label">Fahrenheit</div>
+          <div class="value" id="outF">—</div>
+        </div>
+        <div class="result-card kelvin">
+          <div class="unit-label">Kelvin</div>
+          <div class="value" id="outK">—</div>
+        </div>
+      </div>
+    </div>
+
+    <footer>Absolute zero: −273.15°C · −459.67°F · 0K</footer>
+  </div>
+
+<script>
+  const tempInput  = document.getElementById('tempInput');
+  const convertBtn = document.getElementById('convertBtn');
+  const errorMsg   = document.getElementById('errorMsg');
+  const results    = document.getElementById('results');
+  const thermoFill = document.getElementById('thermoFill');
+  const outC = document.getElementById('outC');
+  const outF = document.getElementById('outF');
+  const outK = document.getElementById('outK');
+
+  const ABSOLUTE_ZERO_C = -273.15;
+  const NUMERIC_PATTERN = /^-?\d+(\.\d+)?$/;
+
+  function getSelectedUnit(){
+    return document.querySelector('input[name="unit"]:checked').value;
+  }
+
+  function showError(text){
+    errorMsg.textContent = text;
+    errorMsg.classList.add('show');
+    results.classList.remove('show');
+    tempInput.classList.add('invalid');
+  }
+
+  function clearError(){
+    errorMsg.classList.remove('show');
+    errorMsg.textContent = '';
+    tempInput.classList.remove('invalid');
+  }
+
+  function toCelsius(value, unit){
+    if (unit === 'C') return value;
+    if (unit === 'F') return (value - 32) * 5 / 9;
+    if (unit === 'K') return value - 273.15;
+  }
+
+  function updateThermo(celsius){
+    // Clamp a wide but readable range (-50°C to 50°C) purely for the visual fill
+    const clamped = Math.max(-50, Math.min(50, celsius));
+    const pct = ((clamped + 50) / 100) * 100;
+    thermoFill.style.height = pct + '%';
+  }
+
+  function formatNum(n){
+    return (Math.round(n * 100) / 100).toString();
+  }
+
+  function convert(){
+    const raw = tempInput.value.trim();
+
+    if (raw === '' || !NUMERIC_PATTERN.test(raw)){
+      showError('Please enter a valid numeric temperature (e.g. 25 or -10.5).');
+      return;
+    }
+
+    const value = parseFloat(raw);
+    const unit = getSelectedUnit();
+    const celsius = toCelsius(value, unit);
+
+    if (celsius < ABSOLUTE_ZERO_C - 0.001){
+      showError('That value is below absolute zero (−273.15°C / −459.67°F / 0K) — temperatures can\'t go any lower than that.');
+      return;
+    }
+
+    clearError();
+
+    const fahrenheit = celsius * 9 / 5 + 32;
+    const kelvin = celsius + 273.15;
+
+    outC.textContent = formatNum(celsius) + ' °C';
+    outF.textContent = formatNum(fahrenheit) + ' °F';
+    outK.textContent = formatNum(kelvin) + ' K';
+
+    results.classList.add('show');
+    updateThermo(celsius);
+  }
+
+  convertBtn.addEventListener('click', convert);
+  tempInput.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') convert();
+  });
+  tempInput.addEventListener('input', clearError);
+</script>
+
+</body>
+</html>
